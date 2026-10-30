@@ -18,6 +18,8 @@ rep('const KEY=(($("bootK")||{}).value||"").trim();', 'const KEY=(QS.get("k")||"
 rep('async function boot(){\nconst t=($("bootT")||{}).value||"";',
     'async function showReply(r){\ntry{history.replaceState(null,"",location.pathname);}catch(e){}\nlet msg="";\ntry{const x=await api("replyDone",r);msg=x&&x.name?x.name+"さんに、やりとりを始めたことを伝えました。":"このリンクはすでに使われているか、見つかりませんでした。";}\ncatch(e){msg="うまくいきませんでした。時間をおいて、もう一度開いてください。";}\ndocument.body.innerHTML=\'<div style="font-family:system-ui,sans-serif;max-width:420px;margin:48px auto;padding:0 16px;text-align:center;color:#1f2933"><h2 style="color:#1d4a9c">SOARiA</h2><p>\'+esc(msg)+\'</p><p style="color:#66737e;font-size:13px">この画面は閉じて大丈夫です。</p></div>\';\n}\nasync function boot(){\nconst rr=QS.get("r");if(rr){showReply(rr);return;}\nconst t=QS.get("t")||"";')
 rep('try{google.script.history.replace(null,KEY?{k:KEY}:{},"");}catch(e){}', 'try{history.replaceState(null,"",location.pathname+(KEY?"?k="+encodeURIComponent(KEY):""));}catch(e){}')
+rep('<option value="kana">名前順</option>', '<option value="kana">名前順</option><option value="pref">地域順</option>')
+rep('if(st.sort==="kana")list.sort((a,b)=>String(a.kana).localeCompare(String(b.kana),"ja"));', 'if(st.sort==="kana")list.sort((a,b)=>String(a.kana).localeCompare(String(b.kana),"ja"));\n  if(st.sort==="pref"){const pi=p=>{const i=ALLPREFS.indexOf(p);return i<0?999:i;};list.sort((a,b)=>pi(a.pref)-pi(b.pref)||String(a.kana).localeCompare(String(b.kana),"ja"));}')
 assert 'google.script' not in s and '<?' not in s
 os.makedirs('docs', exist_ok=True)
 open('docs/index.html', 'w', encoding='utf-8').write(s)
