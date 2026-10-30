@@ -463,6 +463,9 @@ dialog.guide{width:min(960px,calc(100% - 24px));border-radius:22px;overflow:hidd
 .nfoot .linkbtn{font-size:13px;padding:0}
 .aedit{margin-left:auto;border:0;background:var(--fill);color:var(--muted);border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer}
 .alist{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.atabs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px}
+.atopic{grid-column:1/-1;font-size:15px;font-weight:700;color:#18263d;margin:14px 0 0;padding-left:10px;border-left:4px solid var(--ink)}
+.atopic:first-child{margin-top:0}
 .acard{background:var(--surface);border-radius:18px;padding:18px;box-shadow:var(--card-sh,0 1px 2px rgba(20,40,70,.06));display:grid;gap:10px;align-content:start}
 .acard .adate{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
 .acard h3{font-size:16px;line-height:1.5;color:#18263d;margin:0}
@@ -534,7 +537,8 @@ dialog.guide{width:min(960px,calc(100% - 24px));border-radius:22px;overflow:hidd
 </main>
 <main class="wrap view" id="archive" hidden>
 <div class="sechead first"><h2>アーカイブ</h2><button type="button" class="addsm" id="archAdd" hidden>＋ アーカイブを追加</button></div>
-<p class="plead">SOARiAミーティングの録画です。「録画を見る」を押すとZoomが開きます。パスコードを聞かれたら、コピーして貼り付けてください。</p>
+<div class="atabs" role="group" aria-label="アーカイブの種類"><button type="button" class="tab" data-ag="soaria" aria-pressed="true">SOARiA</button><button type="button" class="tab" data-ag="raytus" aria-pressed="false">RAYTUS group.</button></div>
+<p class="plead" id="aLead"></p>
 <div class="searchwrap asearch"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5" stroke-linecap="round"/></svg><input id="aq" class="search" type="search" placeholder="タイトル・メモで検索" aria-label="アーカイブを検索"></div>
 <div class="alist" id="archList"></div>
 </main>
@@ -633,7 +637,11 @@ dialog.guide{width:min(960px,calc(100% - 24px));border-radius:22px;overflow:hidd
 <form class="mbody" id="admForm" novalidate>
 <h2 id="admTitle"></h2>
 <p class="admnote">運営の人にだけ表示されている画面です。</p>
-<label class="field">日付<input type="date" id="admDate"></label>
+<label class="field" data-only="archives">種類<select id="admGroup"><option value="soaria">SOARiAの録画</option><option value="raytus">RAYTUS group.全体の動画・資料</option></select></label>
+<label class="field" id="admTopicF">テーマ<input type="text" id="admTopic" maxlength="40" list="admTopics" placeholder="例：ネオファミリーについて"></label>
+<datalist id="admTopics"></datalist>
+<p class="ferr" data-aerr="topic"></p>
+<label class="field"><span id="admDateLabel">日付</span><input type="date" id="admDate"></label>
 <p class="ferr" data-aerr="date"></p>
 <label class="field">タイトル<input type="text" id="admTitleIn" maxlength="100"></label>
 <p class="ferr" data-aerr="title"></p>
@@ -1288,12 +1296,14 @@ catch(e){if(isSessionErr(e))failed(e);}
 const fmtDate=d=>{const m=String(d||"").match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return esc(d);const w="日月火水木金土"[new Date(+m[1],+m[2]-1,+m[3]).getDay()];return `${+m[1]}年${+m[2]}月${+m[3]}日（${w}）`;};
 const isNew=d=>{const t=new Date(String(d)+"T00:00:00").getTime();return t&&Date.now()-t<7*864e5;};
 const VIDEO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3z" stroke-linejoin="round"/></svg>';
+const isRay=a=>a.group==="raytus";
 function archCard(a){
+const top=isRay(a)?(a.date?fmtDate(a.date):""):fmtDate(a.date)+(isNew(a.date)?'<span class="newb">NEW</span>':"");
 return `<article class="acard">
-<div class="adate">${fmtDate(a.date)}${isNew(a.date)?'<span class="newb">NEW</span>':""}${ADMIN?`<button type="button" class="aedit" data-aedit="archives" data-id="${esc(a.id)}">編集</button>`:""}</div>
+${(top||ADMIN)?`<div class="adate">${top}${ADMIN?`<button type="button" class="aedit" data-aedit="archives" data-id="${esc(a.id)}">編集</button>`:""}</div>`:""}
 <h3>${esc(a.title)}</h3>
 ${a.memo?`<p class="amemo">${esc(a.memo)}</p>`:""}
-<div class="aacts"><a class="btn" href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener">${VIDEO}録画を見る</a>
+<div class="aacts"><a class="btn" href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener">${VIDEO}${isRay(a)?"動画を見る":"録画を見る"}</a>
 ${a.passcode?`<span class="pcode">パスコード <code>${esc(a.passcode)}</code><button type="button" data-copy="${esc(a.passcode)}">コピー</button></span>`:""}</div>
 </article>`;
 }
@@ -1315,20 +1325,31 @@ const ops=ADMIN&&/^https?:[/][/]/.test(CONTENT.ops||"");
 $("admBox").hidden=!ADMIN;$("opsLink").hidden=!ops;if(ops)$("opsLink").href=CONTENT.ops;
 if(contentLoaded){
 $("newsList").innerHTML=CONTENT.news.length?CONTENT.news.slice(0,5).map(newsItem).join(""):`<div class="empty2">いまはお知らせはありません。</div>`;
-$("homeArch").innerHTML=CONTENT.archives.length?CONTENT.archives.slice(0,2).map(archCard).join(""):`<div class="empty2">まだ録画はありません。</div>`;
+const sa=CONTENT.archives.filter(a=>!isRay(a));
+$("homeArch").innerHTML=sa.length?sa.slice(0,2).map(archCard).join(""):`<div class="empty2">まだ録画はありません。</div>`;
 }else{$("newsList").innerHTML=$("homeArch").innerHTML=`<div class="empty2">読み込んでいます…</div>`;}
 const nm=[...M].sort((a,b)=>String(b.joined).localeCompare(String(a.joined))||b.id-a.id).slice(0,10);
 $("newMembers").innerHTML=loaded?(nm.length?nm.map(m=>`<button type="button" class="nm" data-open="${m.id}">${av(m)}<b>${esc(m.name)}</b></button>`).join(""):`<div class="empty2" style="flex:1">まだ登録しているメンバーがいません。最初の1人になりませんか？</div>`):"";
 }
+let AG="soaria";
+const A_LEAD={soaria:"SOARiAミーティングの録画です。「録画を見る」を押すとZoomが開きます。パスコードを聞かれたら、コピーして貼り付けてください。",raytus:"RAYTUS group.全体の説明動画・資料です。テーマごとにまとめています。"};
 function renderArchive(){
+document.querySelectorAll("[data-ag]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.ag===AG));
+$("aLead").textContent=A_LEAD[AG];
 if(!contentLoaded){$("archList").innerHTML=`<div class="empty2">読み込んでいます…</div>`;return;}
 const q=$("aq").value.trim().toLowerCase();
-const list=CONTENT.archives.filter(a=>!q||(a.title+" "+a.memo+" "+a.date).toLowerCase().includes(q));
-$("archList").innerHTML=list.length?list.map(archCard).join(""):`<div class="empty2">${q?"見つかりませんでした。":"まだ録画はありません。"}</div>`;
+const list=CONTENT.archives.filter(a=>(AG==="raytus")===isRay(a)).filter(a=>!q||(a.title+" "+a.memo+" "+a.date+" "+(a.topic||"")).toLowerCase().includes(q));
+const none=`<div class="empty2">${q?"見つかりませんでした。":(AG==="raytus"?"まだ動画はありません。":"まだ録画はありません。")}</div>`;
+if(!list.length){$("archList").innerHTML=none;return;}
+if(AG==="soaria"){$("archList").innerHTML=list.map(archCard).join("");return;}
+const byC=(a,b)=>String(a.created).localeCompare(String(b.created));
+const groups=new Map();[...list].sort(byC).forEach(a=>{const t=a.topic||"その他";if(!groups.has(t))groups.set(t,[]);groups.get(t).push(a);});
+$("archList").innerHTML=[...groups].map(([t,items])=>`<h3 class="atopic">${esc(t)}</h3>`+items.map(archCard).join("")).join("");
 }
 $("aq").addEventListener("input",renderArchive);
+document.querySelector(".atabs").addEventListener("click",e=>{const b=e.target.closest("[data-ag]");if(!b)return;AG=b.dataset.ag;renderArchive();});
 $("newMembers").addEventListener("click",e=>{const o=e.target.closest("[data-open]");if(!o)return;openProf(Number(o.dataset.open));prof.showModal();$("profBody").querySelector(".pscroll").scrollTop=0;});
- 
+/* パスコードのコピー・お知らせの続き */
 function copyText(t){
 const done=()=>toast("パスコードをコピーしました");
 const fallback=()=>{const ta=document.createElement("textarea");ta.value=t;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand("copy");}catch(e){}ta.remove();ok?done():toast("コピーできませんでした。長押しで選んでコピーしてください");};
@@ -1339,20 +1360,30 @@ const c=e.target.closest("[data-copy]");if(c){copyText(c.dataset.copy);return;}
 const mo=e.target.closest("[data-more]");if(mo){const b=$(mo.dataset.more);const open=b.classList.toggle("clamp");mo.textContent=open?"続きを読む":"閉じる";return;}
 const ae=e.target.closest("[data-aedit]");if(ae){openAdmin(ae.dataset.aedit,CONTENT[ae.dataset.aedit].find(x=>String(x.id)===ae.dataset.id));return;}
 });
- 
+/* 運営：お知らせ・アーカイブの追加と編集 */
 const admDlg=$("admDlg");let admKind="",admItem=null,delArmed=false;
 function openAdmin(kind,item){
 admKind=kind;admItem=item||null;delArmed=false;
 const today=new Date(Date.now()+9*36e5).toISOString().slice(0,10);
 $("admTitle").textContent=(item?"":"")+(kind==="news"?(item?"お知らせを編集":"お知らせを追加"):(item?"アーカイブを編集":"アーカイブを追加"));
 admDlg.querySelectorAll("[data-only]").forEach(el=>el.hidden=el.dataset.only!==kind);
-$("admUrlLabel").textContent=kind==="news"?"リンク（任意）":"録画のURL（Zoomの共有リンク）";
-$("admDate").value=item?item.date:today;$("admTitleIn").value=item?item.title:"";$("admBody").value=item?item.body||"":"";
+$("admGroup").value=item?(isRay(item)?"raytus":"soaria"):AG;
+$("admTopic").value=item?item.topic||"":"";
+$("admTopics").innerHTML=[...new Set(CONTENT.archives.map(a=>a.topic).filter(Boolean))].map(t=>`<option value="${esc(t)}">`).join("");
+$("admDate").value=item?item.date:(kind==="archives"&&$("admGroup").value==="raytus"?"":today);
+admGroupUi();$("admTitleIn").value=item?item.title:"";$("admBody").value=item?item.body||"":"";
 $("admUrl").value=item?item.url||"":"";$("admPass").value=item?item.passcode||"":"";$("admMemo").value=item?item.memo||"":"";
 admDlg.querySelectorAll("[data-aerr]").forEach(el=>el.textContent="");
 $("admDel").hidden=!item;$("admDel").textContent="削除する";
 admDlg.showModal();
 }
+function admGroupUi(){
+const ray=admKind==="archives"&&$("admGroup").value==="raytus";
+$("admTopicF").hidden=!ray;
+$("admDateLabel").textContent=ray?"日付（任意）":"日付";
+$("admUrlLabel").textContent=admKind==="news"?"リンク（任意）":(ray?"動画・資料のURL":"録画のURL（Zoomの共有リンク）");
+}
+$("admGroup").addEventListener("change",admGroupUi);
 $("newsAdd").addEventListener("click",()=>openAdmin("news",null));
 $("admNews").addEventListener("click",()=>openAdmin("news",null));
 $("admArch").addEventListener("click",()=>openAdmin("archives",null));
@@ -1360,7 +1391,7 @@ $("archAdd").addEventListener("click",()=>openAdmin("archives",null));
 $("admCancel").addEventListener("click",()=>admDlg.close());
 $("admForm").addEventListener("submit",async e=>{
 e.preventDefault();
-const item={id:admItem?admItem.id:"",date:$("admDate").value,title:$("admTitleIn").value.trim(),body:$("admBody").value.trim(),url:$("admUrl").value.trim(),passcode:$("admPass").value.trim(),memo:$("admMemo").value.trim()};
+const item={id:admItem?admItem.id:"",date:$("admDate").value,title:$("admTitleIn").value.trim(),body:$("admBody").value.trim(),url:$("admUrl").value.trim(),passcode:$("admPass").value.trim(),memo:$("admMemo").value.trim(),group:$("admGroup").value,topic:$("admTopic").value.trim()};
 const btn=$("admSave");btn.disabled=true;btn.textContent="保存しています…";
 admDlg.querySelectorAll("[data-aerr]").forEach(el=>el.textContent="");
 try{
