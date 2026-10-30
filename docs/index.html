@@ -547,7 +547,7 @@ dialog.guide{width:min(960px,calc(100% - 24px));border-radius:22px;overflow:hidd
 <p class="bjoin" id="bjoin"><span>まだ載っていない方は</span><button type="button" class="joinbtn" id="joinBtn">メンバー登録する ›</button></p>
 </section>
 <div class="sechead mt"><h2>メンバー</h2>
-<label class="spill selpill"><span class="sr">並び順</span><select id="sort" aria-label="並び順"><option value="new">新しい順</option><option value="kana">名前順</option></select></label>
+<label class="spill selpill"><span class="sr">並び順</span><select id="sort" aria-label="並び順"><option value="new">新しい順</option><option value="kana">名前順</option><option value="pref">地域順</option></select></label>
 </div>
 <div class="tabs" role="group" aria-label="お仕事の有無">
 <button type="button" class="tab" data-work="all" aria-pressed="true">すべて <span data-wc="all"></span></button>
@@ -849,6 +849,7 @@ return true;
 });
 if(st.sort==="new")list.sort((a,b)=>String(b.joined).localeCompare(String(a.joined))||b.id-a.id);
 if(st.sort==="kana")list.sort((a,b)=>String(a.kana).localeCompare(String(b.kana),"ja"));
+  if(st.sort==="pref"){const pi=p=>{const i=ALLPREFS.indexOf(p);return i<0?999:i;};list.sort((a,b)=>pi(a.pref)-pi(b.pref)||String(a.kana).localeCompare(String(b.kana),"ja"));}
 $("total").textContent=M.length;
 $("result").textContent=`${list.length} 名`;
 const n=st.cats.size+st.prefs.size+st.flags.size;
