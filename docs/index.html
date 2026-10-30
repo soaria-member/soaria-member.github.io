@@ -1319,7 +1319,7 @@ ${(long||n.url)?`<div class="nfoot">${long?`<button type="button" class="linkbtn
 function renderHome(){
 $("hTotal").textContent=loaded?M.length:"…";
 $("tMembers").textContent=loaded?`${M.length}名が登録`:"読み込み中";
-$("tArchive").textContent=contentLoaded?`録画 ${CONTENT.archives.length}本`:"読み込み中";
+$("tArchive").textContent=contentLoaded?`録画 ${CONTENT.archives.filter(a=>!isRay(a)).length}本`:"読み込み中";
 $("newsAdd").hidden=!ADMIN;$("archAdd").hidden=!ADMIN;
 const ops=ADMIN&&/^https?:[/][/]/.test(CONTENT.ops||"");
 $("admBox").hidden=!ADMIN;$("opsLink").hidden=!ops;if(ops)$("opsLink").href=CONTENT.ops;
