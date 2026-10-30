@@ -553,7 +553,7 @@ dialog.guide{width:min(960px,calc(100% - 24px));border-radius:22px;overflow:hidd
 <div class="sechead first"><h2>アーカイブ</h2><button type="button" class="addsm" id="archAdd" hidden>＋ アーカイブを追加</button></div>
 <div id="aTop">
 <div class="agcards">
-<button type="button" class="agcard" data-ag="soaria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3z" stroke-linejoin="round"/></svg><span><b>最新のZoom録画</b><small>ミーティングの録画。新しいものが上に並びます</small><em class="agn" id="agnS"></em></span><i class="chev" aria-hidden="true">›</i></button>
+<button type="button" class="agcard" data-ag="soaria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3z" stroke-linejoin="round"/></svg><span><b>最新のアーカイブ</b><small>ミーティングの録画。新しいものが上に並びます</small><em class="agn" id="agnS"></em></span><i class="chev" aria-hidden="true">›</i></button>
 <button type="button" class="agcard ray" data-ag="raytus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2.5"/><path d="M10 8.5v5l4.5-2.5z" stroke-linejoin="round"/><path d="M8 21h8" stroke-linecap="round"/></svg><span><b>はじめに見たい動画</b><small>EEDA・ネオファミリーなど、いつでも見返せる動画</small><em class="agn" id="agnR"></em></span><i class="chev" aria-hidden="true">›</i></button>
 </div>
 <div class="sechead mt"><h2>最近の録画</h2></div>
@@ -662,7 +662,7 @@ dialog.guide{width:min(960px,calc(100% - 24px));border-radius:22px;overflow:hidd
 <form class="mbody" id="admForm" novalidate>
 <h2 id="admTitle"></h2>
 <p class="admnote">運営の人にだけ表示されている画面です。</p>
-<label class="field" data-only="archives">種類<select id="admGroup"><option value="soaria">最新のZoom録画（新しい順に並ぶ）</option><option value="raytus">はじめに見たい動画（テーマごとに並ぶ）</option></select></label>
+<label class="field" data-only="archives">種類<select id="admGroup"><option value="soaria">最新のアーカイブ（新しい順に並ぶ）</option><option value="raytus">はじめに見たい動画（テーマごとに並ぶ）</option></select></label>
 <label class="field" id="admTopicF">テーマ<input type="text" id="admTopic" maxlength="40" list="admTopics" placeholder="例：ネオファミリーについて"></label>
 <datalist id="admTopics"></datalist>
 <p class="ferr" data-aerr="topic"></p>
@@ -1359,7 +1359,7 @@ $("newMembers").innerHTML=loaded?(nm.length?nm.map(m=>`<button type="button" cla
 }
 let AG="";
 const A_LEAD={soaria:"SOARiAミーティングの録画です。「録画を見る」を押すとZoomが開きます。パスコードを聞かれたら、コピーして貼り付けてください。",raytus:"はじめに見ておきたい事業説明・基本の動画です。いつでも見返せるよう、テーマごとにまとめています。"};
-const A_TITLE={soaria:"最新のZoom録画",raytus:"はじめに見たい動画"};
+const A_TITLE={soaria:"最新のアーカイブ",raytus:"はじめに見たい動画"};
 function renderArchive(){
 $("aTop").hidden=!!AG;$("aSub").hidden=!AG;
 if(!AG){
