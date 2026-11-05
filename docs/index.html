@@ -168,6 +168,8 @@ dl dd{margin:0;min-width:0}
 .acts{display:flex;gap:10px;flex-wrap:wrap}
 .acts .btn{flex:1 1 auto}
 .priv{font-size:12px;color:var(--muted);margin:0}
+.cnote{margin:0;padding:12px 14px;border-radius:12px;background:var(--sky-soft);color:#18263d;font-size:13px;line-height:1.7}
+.bnote{margin:6px 0 0;font-size:13px;color:#18263d}
 .vis{display:grid;gap:2px;background:var(--surface-2);border-radius:14px;padding:6px 16px}
 .vis label{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:15px;cursor:pointer;padding:10px 0}
 .vis label + label{border-top:1px solid var(--line)}
@@ -573,6 +575,7 @@ dialog.guide{width:min(960px,calc(100% - 24px));border-radius:22px;overflow:hidd
 <p class="beyebrow">頼みたい人も、話してみたい人も。</p>
 <h1 id="brandTitle">メンバー名簿</h1>
 <p class="bmeta">いま <b id="total"></b> 名が登録しています</p>
+<p class="bnote">つながりたい人がいたら、藤田萌理事長までご連絡ください。</p>
 <p class="bjoin" id="bjoin"><span>まだ載っていない方は</span><button type="button" class="joinbtn" id="joinBtn">メンバー登録する ›</button></p>
 </section>
 <div class="sechead mt"><h2>メンバー</h2>
@@ -843,8 +846,7 @@ foot=`<div class="acts"><button type="button" class="btn" data-edit>プロフィ
 }else if(sent.has(String(m.id))){
 foot=`<div class="wait"><button class="btn" type="button" disabled>返信を待っています</button><p class="priv">${esc(m.name)}さんから返信があるまで、追加で送ることはできません。</p></div>`;
 }else{
-const work=m.status!=="pause"&&(m.items.length||m.skills.length);
-foot=`<div class="acts">${work?`<button class="btn" type="button" data-req="${m.id}" data-t="work">依頼・購入の相談</button><button class="btn sub" type="button" data-req="${m.id}" data-t="talk">話してみたい</button>`:`<button class="btn" type="button" data-req="${m.id}" data-t="talk">話してみたい</button>`}</div>${m.status==="pause"?`<p class="priv">いまはお仕事の受付を止めています。おしゃべりは歓迎です。</p>`:""}`;
+foot=`<p class="cnote">この方とつながりたい・お仕事を相談したいときは、<b>藤田萌理事長</b>までご連絡ください。</p>`;
 }
 const vis=mine?sec("名簿に載せる項目（あなたにだけ表示）",`<div class="vis">${[["area","市区町村"],["fam","家族"],["hob","趣味"]].map(([f,l])=>`<label>${l}を載せる<input type="checkbox" data-vis="${f}" ${m.hide.includes(f)?"":"checked"}></label>`).join("")}</div><p class="priv">オフにした項目は、ほかのメンバーには表示されず、共通点にも使われません。</p>`):"";
 const area=esc(m.pref)+((mine||shown(m,"area"))&&m.city?" "+esc(m.city):"");
@@ -912,7 +914,7 @@ if(st[k].has(v))st[k].delete(v);else st[k].add(v);b.setAttribute("aria-pressed",
 $("active").addEventListener("click",e=>{if(e.target.closest("#aclear")){clearAll();return;}const b=e.target.closest("[data-k]");if(!b)return;
 st[b.dataset.k].delete(b.dataset.v);drawPills();render();});
 document.querySelector(".tabs").addEventListener("click",e=>{const t=e.target.closest("[data-work]");if(!t)return;st.work=t.dataset.work;render();});
- 
+/* ===== 読み込み ===== */
 async function load(){
 loaded=false;render();
 try{
@@ -943,9 +945,9 @@ if($("edit").hidden){render();renderArchive();}
 }catch(e){if(isSessionErr(e)){failed(e);return;}}
 }
 }
- 
+/* ===== スタートガイド・スケジュール ===== */
 let INFO={guide:"",schedule:""};
- 
+/* Canvaの閲覧リンクを埋め込み用に変える（それ以外のURLは別タブで開く） */
 function canvaEmbed(u){const m=String(u||"").match(/^https:\/\/www\.canva\.com\/design\/([\w-]+)\/([\w-]+)[/]/);return m?`https:\/\/www.canva.com/design/${m[1]}/${m[2]}/view?embed`:"";}
 function drawInfo(info){
 INFO=info||INFO;
@@ -1089,7 +1091,7 @@ h+=`
 <div class="group" style="margin-top:12px">
 <div class="frow"><span class="lab">いまの受付状態</span>
 <div class="seg" role="group" aria-label="受付状態">${[["open","お仕事受付中"],["talk","おしゃべり歓迎"],["pause","受付停止中"]].map(([v,l])=>`<button type="button" data-status="${v}" aria-pressed="${d.status===v}">${l}</button>`).join("")}</div>
-<p class="hint">写真の下にラベルで表示されます。受付停止中のあいだは「依頼・購入の相談」ボタンが出ません。</p></div>
+<p class="hint">写真の下にラベルで表示されます。</p></div>
 ${fld("biz","屋号・お店の名前",{ph:"なければ空欄で大丈夫です"})}
 <div class="frow"><label for="e_cat">いちばん近い業種<span class="req">必須</span></label><select id="e_cat" data-f="cat"${editErrs.cat?' aria-invalid="true"':""}>${catOpts}</select>${editErrs.cat?`<p class="ferr">${esc(editErrs.cat)}</p>`:""}
 ${d.cat==="__other"?`<input type="text" data-f="catOther" value="${esc(d.catOther||"")}" placeholder="例：イラスト、ペット、保険・お金" aria-label="業種を入力"${editErrs.catOther?' aria-invalid="true"':""}>${editErrs.catOther?`<p class="ferr">${esc(editErrs.catOther)}</p>`:""}`:""}
