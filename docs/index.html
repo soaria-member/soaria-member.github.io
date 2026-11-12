@@ -802,7 +802,7 @@ span.brx{cursor:default}
 <p class="beyebrow">頼みたい人も、話してみたい人も。</p>
 <h1 id="brandTitle">メンバー名簿</h1>
 <p class="bmeta">いま <b id="total"></b> 名が登録しています</p>
-<p class="bnote">つながりたい人がいたら、藤田萌理事長までご連絡ください。</p>
+<p class="bnote">つながりたい人がいたら、藤田萌理事長までご連絡ください。プロフィールに載っているSNSから、個別につながってもOKです。</p>
 <p class="bjoin" id="bjoin"><span>まだ載っていない方は</span><button type="button" class="joinbtn" id="joinBtn">メンバー登録する ›</button></p>
 </section>
 <div class="sechead mt"><h2>メンバー</h2>
@@ -1105,7 +1105,7 @@ foot=`<div class="acts"><button type="button" class="btn" data-edit>プロフィ
 }else if(sent.has(String(m.id))){
 foot=`<div class="wait"><button class="btn" type="button" disabled>返信を待っています</button><p class="priv">${esc(m.name)}さんから返信があるまで、追加で送ることはできません。</p></div>`;
 }else{
-foot=`<p class="cnote">この方とつながりたい・お仕事を相談したいときは、<b>藤田萌理事長</b>までご連絡ください。</p>`;
+foot=`<p class="cnote">この方とつながりたい・お仕事を相談したいときは、<b>藤田萌理事長</b>までご連絡ください。プロフィールに載っているSNSから、個別につながってもOKです。</p>`;
 }
 const vis=mine?sec("名簿に載せる項目（あなたにだけ表示）",`<div class="vis">${[["area","市区町村"],["fam","家族"],["hob","趣味"]].map(([f,l])=>`<label>${l}を載せる<input type="checkbox" data-vis="${f}" ${m.hide.includes(f)?"":"checked"}></label>`).join("")}</div><p class="priv">オフにした項目は、ほかのメンバーには表示されず、共通点にも使われません。</p>`):"";
 const area=esc(m.pref)+((mine||shown(m,"area"))&&m.city?" "+esc(m.city):"");
