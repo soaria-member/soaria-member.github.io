@@ -717,10 +717,11 @@ span.brx{cursor:default}
 #tbBoard,[data-nav="home"],.tiles [data-board]{position:relative}
 #tabbar .ubd,.tabbar .ubd,#tbBoard .ubd{position:absolute;top:2px;left:calc(50% + 6px);margin:0}
 .tiles [data-board] > .ubd{position:absolute;top:10px;right:10px;margin:0}
-.pushbox{background:var(--surface,#fff);border:1px solid var(--line,#e3e8ef);border-radius:16px;padding:14px 16px;display:grid;gap:8px;margin-top:16px}
-.pushbox h2{font-size:16px;margin:0}
-.pushbox p{margin:0;font-size:14px;color:var(--muted,#5b6b85);line-height:1.7}
+.pushbox #pushBody{display:grid;gap:10px}
+.pushbox p{margin:0;font-size:14px;color:#6b4a1c;line-height:1.7}
 .pushbox .pbtns{display:flex;gap:8px;flex-wrap:wrap}
+.pushbox .btn{background:#e8892b;border-color:#e8892b;color:#fff;justify-self:start}
+.pushbox .btn.sub{background:#fff;border-color:#f1dcb6;color:#9a5a10}
 </style>
 </head>
 <body>
@@ -750,6 +751,10 @@ span.brx{cursor:default}
 <p class="bmeta">いま <b id="hTotal"></b> 名が名簿に登録しています</p>
 <p class="bjoin" id="hJoin"><span>名簿にまだ載っていない方は</span><button type="button" class="joinbtn" id="joinBtnH">メンバー登録する ›</button></p>
 </section>
+<section class="admbox pushbox" id="pushBox" hidden aria-labelledby="pushT">
+<div class="abhd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 10a6 6 0 0 1 12 0c0 4.5 1.6 6 2.2 6.6H3.8C4.4 16 6 14.5 6 10z" stroke-linejoin="round"/><path d="M10 19.5a2.1 2.1 0 0 0 4 0" stroke-linecap="round"/></svg><div><b id="pushT">スマホに通知を届ける</b><small>新着をスマホにお知らせします</small></div></div>
+<div id="pushBody"></div>
+</section>
 <section class="admbox" id="admBox" hidden aria-labelledby="admBoxT">
 <div class="abhd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b id="admBoxT">運営メニュー</b><small>運営の人にだけ表示されています</small></div></div>
 <div class="abacts"><a class="btn" id="opsLink" target="_blank" rel="noopener" hidden>運営ノート（Notion）を開く</a><button type="button" class="btn sub" id="admNews">＋ お知らせ</button><button type="button" class="btn sub" id="admArch">＋ アーカイブ</button><button type="button" class="btn sub" id="admRec" hidden>受け取り記録</button></div>
@@ -766,7 +771,6 @@ span.brx{cursor:default}
 <div class="nmhd"><div><h2 id="nmTitle">新しく加わったメンバー</h2><p class="nmsub" id="nmSub"></p></div><button type="button" class="linkbtn" data-go="app">名簿を見る ›</button></div>
 <div class="newm" id="newMembers"></div>
 </section>
-<section class="pushbox" id="pushBox" hidden aria-labelledby="pushT"><h2 id="pushT">スマホに通知を届ける</h2><div id="pushBody"></div></section>
 <div class="sechead mt"><h2>お知らせ</h2><button type="button" class="addsm" id="newsAdd" hidden>＋ お知らせを追加</button></div>
 <div class="news" id="newsList"></div>
 <div class="sechead mt"><div><h2>掲示板の新着</h2><p class="bnote2">参加中のチャンネルの新着だけが出ます</p></div><button type="button" class="linkbtn" data-board>掲示板を見る ›</button></div>
