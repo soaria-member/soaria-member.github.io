@@ -8,6 +8,9 @@
 <meta name="theme-color" content="#f5f5f7">
 <link rel="icon" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="SOARiA">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -710,6 +713,14 @@ span.brx{cursor:default}
  body.bin .tabbar{display:none!important}
 }
 
+.ubd{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#e5484d;color:#fff;font-size:11px;font-weight:700;line-height:1;margin-left:6px;vertical-align:middle;font-variant-numeric:tabular-nums}
+#tbBoard,[data-nav="home"],.tiles [data-board]{position:relative}
+#tabbar .ubd,.tabbar .ubd,#tbBoard .ubd{position:absolute;top:2px;left:calc(50% + 6px);margin:0}
+.tiles [data-board] > .ubd{position:absolute;top:10px;right:10px;margin:0}
+.pushbox{background:var(--surface,#fff);border:1px solid var(--line,#e3e8ef);border-radius:16px;padding:14px 16px;display:grid;gap:8px;margin-top:16px}
+.pushbox h2{font-size:16px;margin:0}
+.pushbox p{margin:0;font-size:14px;color:var(--muted,#5b6b85);line-height:1.7}
+.pushbox .pbtns{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -755,6 +766,7 @@ span.brx{cursor:default}
 <div class="nmhd"><div><h2 id="nmTitle">新しく加わったメンバー</h2><p class="nmsub" id="nmSub"></p></div><button type="button" class="linkbtn" data-go="app">名簿を見る ›</button></div>
 <div class="newm" id="newMembers"></div>
 </section>
+<section class="pushbox" id="pushBox" hidden aria-labelledby="pushT"><h2 id="pushT">スマホに通知を届ける</h2><div id="pushBody"></div></section>
 <div class="sechead mt"><h2>お知らせ</h2><button type="button" class="addsm" id="newsAdd" hidden>＋ お知らせを追加</button></div>
 <div class="news" id="newsList"></div>
 <div class="sechead mt"><div><h2>掲示板の新着</h2><p class="bnote2">参加中のチャンネルの新着だけが出ます</p></div><button type="button" class="linkbtn" data-board>掲示板を見る ›</button></div>
@@ -1978,6 +1990,85 @@ $("a2hsLink").addEventListener("click",a2hsOpen);
 $("a2hsX").addEventListener("click",()=>{$("a2hsBar").hidden=true;ls.set("soaria-a2hs","done");});
 $("a2hsDone").addEventListener("click",()=>{$("a2hsDlg").close();$("a2hsBar").hidden=true;ls.set("soaria-a2hs","done");});
 $("a2hsDlg").addEventListener("click",e=>{const b=e.target.closest("[data-os]");if(b)a2hsShow(b.dataset.os);if(e.target===$("a2hsDlg"))$("a2hsDlg").close();});
+/* ===== 新着の数（ホーム・掲示板）・アプリのアイコンの数字・通知 ===== */
+const PUSH_OPEN=false;   /* true にすると全員に「通知を受け取る」を出す（false の間は運営だけ） */
+let UNREAD={news:0,board:0},newsSeenT=0;
+function boardUnread(){if(!BD||!BD.joined)return UNREAD.board;return Object.keys(BD.joined).reduce((a,k)=>a+(BD.joined[k]||0),0);}
+function ubd(el,n){if(!el)return;let b=el.querySelector(":scope > .ubd");if(!n){if(b)b.remove();return;}
+if(!b){b=document.createElement("span");b.className="ubd";el.appendChild(b);}b.textContent=n>99?"99+":String(n);b.setAttribute("aria-label",`新着${n}件`);}
+function drawUnread(){
+const nb=UNREAD.board,nn=UNREAD.news;
+document.querySelectorAll('#tbBoard,.tlinks [data-nav="board"],.tiles [data-board]').forEach(el=>ubd(el,nb));
+document.querySelectorAll('[data-nav="home"]').forEach(el=>ubd(el,nn));
+const h=$("newsList")&&$("newsList").previousElementSibling&&$("newsList").previousElementSibling.querySelector("h2");if(h)ubd(h,nn);
+try{if(navigator.setAppBadge){const t=nb+nn;if(t)navigator.setAppBadge(t).catch(()=>{});else navigator.clearAppBadge().catch(()=>{});}}catch(e){}
+}
+/* ホームのお知らせを見たら、少し待ってから「見た」にする */
+function markNewsSeen(){clearTimeout(newsSeenT);if(!UNREAD.news||!device()||view!=="home"||document.hidden)return;
+newsSeenT=setTimeout(()=>{if(view!=="home"||document.hidden)return;api("newsSeen",device()).then(()=>{UNREAD.news=0;drawUnread();}).catch(()=>{});},4000);}
+{const _lc=loadContent;loadContent=async function(){await _lc();if(CONTENT&&CONTENT.unread){UNREAD=Object.assign({news:0,board:0},CONTENT.unread);}drawUnread();markNewsSeen();pushInit();};}
+{const _rb=renderBoard;renderBoard=function(s){_rb(s);if(BD&&BD.joined){UNREAD.board=boardUnread();drawUnread();}};}
+{const _go=go;go=function(v){_go(v);if(v==="home")markNewsSeen();};}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&contentLoaded&&device())loadContent();});
+/* 通知のリンク（#board-チャンネル / #news）から開いたとき */
+function openFromHash(){const h=location.hash;if(!h)return;
+const m=h.match(/^#board-(.+)$/);if(m){go("board");setTimeout(()=>{try{bOpen(decodeURIComponent(m[1]));}catch(e){}},600);}
+else if(h==="#news"){go("home");setTimeout(()=>{const n=$("newsList");if(n)n.scrollIntoView({behavior:"smooth",block:"start"});},400);}
+try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}
+window.addEventListener("hashchange",openFromHash);
+/* --- 通知（GitHub Pages のサイトでだけ動く） --- */
+const PUSH_OK=typeof API_URL!=="undefined"&&"serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window;
+const STANDALONE=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+let swReg=null;
+function idbSet(obj){return new Promise(res=>{try{const r=indexedDB.open("soaria",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");
+r.onsuccess=()=>{const tx=r.result.transaction("kv","readwrite");tx.objectStore("kv").put(obj,"cfg");tx.oncomplete=()=>res(true);tx.onerror=()=>res(false);};r.onerror=()=>res(false);}catch(e){res(false);}});}
+const b64ToBytes=s=>{s=s.replace(/-/g,"+").replace(/_/g,"/");s+="===".slice((s.length+3)%4);const b=atob(s);return Uint8Array.from(b,c=>c.charCodeAt(0));};
+async function pushInit(){
+if(!PUSH_OK)return drawPush();
+try{if(!swReg)swReg=await navigator.serviceWorker.register("sw.js");}catch(e){swReg=null;}
+if(device())idbSet({api:API_URL,device:device()});
+try{const s=swReg&&await swReg.pushManager.getSubscription();if(s&&device())api("pushSub",device(),{endpoint:s.endpoint,ua:navigator.userAgent.slice(0,120)}).catch(()=>{});}catch(e){}
+drawPush();openFromHash();
+}
+async function drawPush(){
+const box=$("pushBox");if(!box)return;
+const show=!!meFull&&(PUSH_OPEN||ADMIN);
+if(!show){box.hidden=true;return;}
+box.hidden=false;
+let st="",sub=null;
+if(!PUSH_OK){st=IS_IOS&&!STANDALONE?"ios":"none";}
+else{try{sub=swReg&&await swReg.pushManager.getSubscription();}catch(e){}st=sub?"on":Notification.permission==="denied"?"denied":"off";}
+const msg={
+off:`<p>お知らせや、参加中のチャンネルへの投稿、自分の投稿へのコメントがあったときに、スマホに通知が届きます。アイコンに新着の数も出ます。</p><button type="button" class="btn" id="pushOn">通知を受け取る</button>`,
+on:`<p>この端末で通知を受け取っています。</p><div class="pbtns"><button type="button" class="btn sub" id="pushOff">通知を止める</button>${ADMIN?'<button type="button" class="btn sub" id="pushTest">テスト通知を送る</button>':""}</div>`,
+denied:`<p>この端末では通知がブロックされています。スマホの「設定」で、このサイト（またはSOARiAのアイコン）の通知を許可してください。</p>`,
+ios:`<p>iPhoneは、<b>ホーム画面に追加したSOARiAのアイコンから開く</b>と、通知をオンにできます。</p><button type="button" class="btn sub" id="pushA2hs">ホーム画面に追加する方法</button>`,
+none:`<p>この端末・ブラウザは通知に対応していません。iPhoneはSafari、AndroidはChromeでお試しください。</p>`}[st];
+$("pushBody").innerHTML=msg;
+}
+document.addEventListener("click",async e=>{
+const t=e.target.closest("#pushOn,#pushOff,#pushTest,#pushA2hs");if(!t)return;
+if(t.id==="pushA2hs"){const o=$("a2hsOpen");if(o)o.click();return;}
+t.disabled=true;
+try{
+if(t.id==="pushOn"){
+const p=await Notification.requestPermission();if(p!=="granted"){toast("通知が許可されませんでした");return drawPush();}
+if(!swReg)swReg=await navigator.serviceWorker.register("sw.js");await navigator.serviceWorker.ready;
+const key=await api("pushKey");
+const s=await swReg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64ToBytes(key)});
+await idbSet({api:API_URL,device:device()});
+await api("pushSub",device(),{endpoint:s.endpoint,ua:navigator.userAgent.slice(0,120)});
+toast("通知をオンにしました");
+}else if(t.id==="pushOff"){
+const s=swReg&&await swReg.pushManager.getSubscription();if(s){await api("pushUnsub",device(),s.endpoint).catch(()=>{});await s.unsubscribe();}
+toast("通知を止めました");
+}else if(t.id==="pushTest"){
+const r=await api("pushTest",device());toast(r&&r.sent?"テスト通知を送りました":"送れませんでした（"+JSON.stringify(r&&r.codes||r&&r.err||"")+"）");
+}
+}catch(err){toast("うまくいきませんでした："+String(err&&err.message||err).slice(0,60));}
+finally{t.disabled=false;drawPush();}
+});
+{const _l=load;load=async function(){await _l();drawPush();};}
 boot();
 </script>
 </body></html>
