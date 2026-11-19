@@ -2,7 +2,7 @@ name: サイトを更新
 on:
   workflow_dispatch:
   push:
-    paths: ['build.py', '.github/workflows/build.yml']
+    paths: ['build.py', '.github/workflows/build.yml', 'sw.js', 'manifest.webmanifest']
 permissions:
   contents: write
 jobs:
