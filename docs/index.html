@@ -1995,7 +1995,7 @@ $("a2hsX").addEventListener("click",()=>{$("a2hsBar").hidden=true;ls.set("soaria
 $("a2hsDone").addEventListener("click",()=>{$("a2hsDlg").close();$("a2hsBar").hidden=true;ls.set("soaria-a2hs","done");});
 $("a2hsDlg").addEventListener("click",e=>{const b=e.target.closest("[data-os]");if(b)a2hsShow(b.dataset.os);if(e.target===$("a2hsDlg"))$("a2hsDlg").close();});
 /* ===== 新着の数（ホーム・掲示板）・アプリのアイコンの数字・通知 ===== */
-const PUSH_OPEN=false;   /* true にすると全員に「通知を受け取る」を出す（false の間は運営だけ） */
+const PUSH_OPEN=true;   /* false にすると「通知を受け取る」は運営だけに出る */
 let UNREAD={news:0,board:0},newsSeenT=0;
 function boardUnread(){if(!BD||!BD.joined)return UNREAD.board;return Object.keys(BD.joined).reduce((a,k)=>a+(BD.joined[k]||0),0);}
 function ubd(el,n){if(!el)return;let b=el.querySelector(":scope > .ubd");if(!n){if(b)b.remove();return;}
@@ -2042,6 +2042,7 @@ box.hidden=false;
 let st="",sub=null;
 if(!PUSH_OK){st=IS_IOS&&!STANDALONE?"ios":"none";}
 else{try{sub=swReg&&await swReg.pushManager.getSubscription();}catch(e){}st=sub?"on":Notification.permission==="denied"?"denied":"off";}
+if(st==="on"&&!ADMIN){box.hidden=true;return;}   /* オンにした人には出さない（止めるときはスマホの設定で） */
 const msg={
 off:`<p>お知らせや、参加中のチャンネルへの投稿、自分の投稿へのコメントがあったときに、スマホに通知が届きます。アイコンに新着の数も出ます。</p><button type="button" class="btn" id="pushOn">通知を受け取る</button>`,
 on:`<p>この端末で通知を受け取っています。</p><div class="pbtns"><button type="button" class="btn sub" id="pushOff">通知を止める</button>${ADMIN?'<button type="button" class="btn sub" id="pushTest">テスト通知を送る</button>':""}</div>`,
