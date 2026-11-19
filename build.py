@@ -8,7 +8,7 @@ def rep(a, b):
     global s
     assert s.count(a) == 1, (a[:70], s.count(a))
     s = s.replace(a, b)
-rep('<meta charset="utf-8">\n', '<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<title>SOARiA</title>\n<meta name="robots" content="noindex, nofollow">\n<meta name="theme-color" content="#f5f5f7">\n<link rel="icon" href="icon.png">\n<link rel="apple-touch-icon" href="icon.png">\n<meta name="apple-mobile-web-app-title" content="SOARiA">\n')
+rep('<meta charset="utf-8">\n', '<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<title>SOARiA</title>\n<meta name="robots" content="noindex, nofollow">\n<meta name="theme-color" content="#f5f5f7">\n<link rel="icon" href="icon.png">\n<link rel="apple-touch-icon" href="icon.png">\n<link rel="manifest" href="manifest.webmanifest">\n<meta name="apple-mobile-web-app-capable" content="yes">\n<meta name="mobile-web-app-capable" content="yes">\n<meta name="apple-mobile-web-app-title" content="SOARiA">\n')
 s, n = re.subn(r'<input type="hidden" id="boot[TK]" value="[^"]*">\n', '', s)
 assert n == 2, n
 rep('return new Promise((res,rej)=>google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn](...args));',
@@ -33,4 +33,15 @@ bg = Image.new('RGBA', (180, 180), (255, 255, 255, 255)); w, h = im.size; k = 15
 im = im.resize((int(w * k), int(h * k)), Image.LANCZOS)
 bg.paste(im, ((180 - im.size[0]) // 2, (180 - im.size[1]) // 2), im)
 bg.convert('RGB').save('docs/icon.png')
+# ホーム画面用・通知用の大きいアイコン
+src = Image.open(io.BytesIO(base64.b64decode(H.unescape(m.group(1))))).convert('RGBA')
+for z in (192, 512):
+    cv = Image.new('RGBA', (z, z), (255, 255, 255, 255)); sw0, sh0 = src.size; f = z * 0.83 / max(sw0, sh0)
+    r = src.resize((int(sw0 * f), int(sh0 * f)), Image.LANCZOS)
+    cv.paste(r, ((z - r.size[0]) // 2, (z - r.size[1]) // 2), r)
+    cv.convert('RGB').save('docs/icon-%d.png' % z)
+# 通知を受け取る部品と、アプリとしての設定ファイルをコピー
+import shutil
+for fname in ('sw.js', 'manifest.webmanifest'):
+    shutil.copy(fname, 'docs/' + fname)
 print('built', len(s))
