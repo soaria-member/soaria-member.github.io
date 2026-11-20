@@ -764,7 +764,7 @@ span.brx{cursor:default}
 <button class="itile" type="button" id="guideBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H10a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4z" stroke-linejoin="round"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H14a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6z" stroke-linejoin="round"/></svg><span><b>スタートガイド</b><small>はじめての方はこちら</small></span></button>
 <a class="itile" id="schedBtn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4" stroke-linecap="round"/><circle cx="8.5" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/></svg><span><b>スケジュール</b><small>TimeTreeで見る・参加</small></span></a>
 <button class="itile" type="button" data-go="app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8.5" r="3.3"/><path d="M3 19.5c.9-3.2 3.2-4.9 6-4.9s5.1 1.7 6 4.9" stroke-linecap="round"/><path d="M15.5 5.6a3.2 3.2 0 0 1 0 6M17.5 14.9c1.7.6 2.9 2.1 3.5 4.6" stroke-linecap="round"/></svg><span><b>メンバー名簿</b><small><span id="tMembers"></span></small></span></button>
-<button class="itile" type="button" data-board><svg data-x viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5A1.5 1.5 0 0 1 19 17h-7l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z" stroke-linejoin="round"/><path d="M8 10h8M8 13h5" stroke-linecap="round"/></svg><span><b>掲示板</b><small>交流会・イベント</small></span></button>
+<button class="itile" type="button" data-board><svg data-x viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5A1.5 1.5 0 0 1 19 17h-7l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z" stroke-linejoin="round"/><path d="M8 10h8M8 13h5" stroke-linecap="round"/></svg><span><b>掲示板</b><small>地域の交流会</small></span></button>
 <button class="itile" type="button" data-go="archive"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3z" stroke-linejoin="round"/></svg><span><b>アーカイブ</b><small><span id="tArchive"></span></small></span></button>
 </div>
 <section class="nmbox" aria-labelledby="nmTitle">
@@ -1545,8 +1545,8 @@ down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2
 bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15zM10 20.5a2 2 0 0 0 4 0" stroke-linejoin="round"/></svg>'
 };
 const B_RSVP=["参加","不参加","未定"],B_EMO=["👍","❤️","😊","🙏","🎉"];
-const B_TYPES={meet:{label:"交流会のお知らせ",icon:"users",hint:"交流会の日時・場所やZoomリンク"},event:{label:"イベント告知",icon:"cal",hint:"各地での個人の活動のイベント"}};
-const B_RULES=`<ul class="brules"><li><b>地域 ＞ 都道府県のチャンネル</b>には、交流会の開催のお知らせ（Zoomリンクなど）と、各地での個人の活動のイベント告知を投稿できます。</li><li><b>投稿できるのは、各チャンネルのリーダーに聞いて許可をもらった人だけです。</b>勝手に投稿しないでください。リーダーはチャンネルの上に表示されています。<b>リーダーが決まるまでは、藤田萌理事長に許可をもらってください。</b></li><li>返信は、基本的に<b>スタンプ</b>（参加・不参加・未定など）でお願いします。質問がある場合などに限り、コメントできます。</li><li>自由な雑談は控えてください。</li><li>都道府県のチャンネルは運営が作ります。ほしい地域があれば運営に伝えてください。</li></ul><p class="brnote">個別につながりたいときは、<b>藤田萌理事長</b>に連絡して、LINEなどでつながってください。メンバー名簿のSNSからつながることもできます。</p>`;
+const B_TYPES={meet:{label:"交流会のお知らせ",icon:"users",hint:"地域の交流会の日時・場所やZoomリンク"},event:{label:"地域のイベント",icon:"cal",hint:"その地域で開かれるイベントのお知らせ"}};
+const B_RULES=`<ul class="brules"><li>この掲示板は、<b>地域ごとの交流掲示板</b>です。<b>地域 ＞ 都道府県のチャンネル</b>に、その地域の交流会や、地域のイベントのお知らせを投稿します。</li><li>各チャンネルには<b>リーダー</b>を立てて、定期的に地域の交流会を開いてもらいます。</li><li><b>投稿できるのは、各チャンネルのリーダーに聞いて許可をもらった人だけです。</b>勝手に投稿しないでください。リーダーはチャンネルの上に表示されています。<b>リーダーが決まるまでは、藤田萌理事長に許可をもらってください。</b></li><li>返信は、基本的に<b>スタンプ</b>（参加・不参加・未定など）でお願いします。質問がある場合などに限り、コメントできます。</li><li><b>全国の交流会や、地域に関係ない個人のお知らせ・告知・宣伝は、LINEのオープンチャット</b>に投稿してください。</li><li>自由な雑談は控えてください。</li><li>都道府県のチャンネルは運営が作ります。ほしい地域があれば運営に伝えてください。</li></ul><p class="brnote">個別につながりたいときは、<b>藤田萌理事長</b>に連絡して、LINEなどでつながってください。メンバー名簿のSNSからつながることもできます。</p>`;
 let BD=null,BCUR="rules",bLoading=false,bOpenT=new Set(),bCatClosed=new Set(),bType="meet",bPhoto="",bAddCat=null;
 const BIMG={};
 const bWhen=t=>{const d=new Date(t);return isNaN(d)?"":`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}`;};
@@ -1638,7 +1638,7 @@ $("bLb").addEventListener("click",()=>$("bLb").close());
  
 const BF={
 meet:[["title","タイトル","例：長野メンバー交流会",60],["date","日時","例：11月20日（金）20:00〜21:00",60],["place","場所","例：Zoom／安曇野市内のカフェ",80],["zoom","Zoomリンク（任意）","https:\/\/zoom.us/j/...",300,"url"],["body","内容（任意）","どんな会か、ひとことで",1000,"area"],["photo","画像（任意）","",0,"file"]],
-event:[["title","イベント名","例：親子パン教室 in 安曇野",60],["date","日時","例：11月29日（日）10:00〜12:00",60],["place","場所","例：安曇野市内の公民館／オンライン",80],["link","詳しく・申し込みのURL（任意）","https:\/\/",300,"url"],["body","内容（任意）","どんなイベントか、ひとことで",1000,"area"],["photo","画像（任意）","",0,"file"]]
+event:[["title","イベント名","例：親子パン教室 in 安曇野",60],["date","日時","例：11月29日（日）10:00〜12:00",60],["place","場所","例：安曇野市内の公民館",80],["link","詳しく・申し込みのURL（任意）","https:\/\/",300,"url"],["body","内容（任意）","どんなイベントか、ひとことで",1000,"area"],["photo","画像（任意）","",0,"file"]]
 };
 function bDrawFields(){
 document.querySelectorAll("#bTsel [data-bty]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.bty===bType)));
